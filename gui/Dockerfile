@@ -12,7 +12,7 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy your code
+# Copy  code
 COPY pyqt_scanner.py scanner.py requirements.txt ./
 
 # Install Python dependencies
