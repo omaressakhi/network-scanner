@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: dDf
+    container_name: scanner_backend
+    networks:
+      - scanner_net
+    stdin_open: true
+    tty: true
+
+  gui:
+    build:
+      context: .
+      dockerfile: db
+    container_name: scanner_gui_v2
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    networks:
+      - scanner_net
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+
+networks:
+  scanner_net:
+    driver: bridge
+
