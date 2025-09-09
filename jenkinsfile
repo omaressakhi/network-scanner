@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        COMPOSE_PROJECT_NAME = "network_scanner"
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out code from GitHub...'
+                git branch: 'main', url: 'https://github.com/omaressakhi/network-scanner.git'
+            }
+        }
+
+        stage('Build and Start Containers') {
+            steps {
+                echo 'Building and starting all services via docker-compose...'
+                sh 'docker-compose -f docker-compose.yml up --build -d'
+            }
+        }
+
+        stage('Run GUI Scanner') {
+            steps {
+                echo 'Launching GUI container...'
+                sh '''
+                xhost +local:docker
+                docker-compose -f docker-compose.yml run --rm gui
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Stopping all containers...'
+            sh 'docker-compose -f docker-compose.yml down'
+        }
+    }
+}
