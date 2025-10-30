@@ -14,7 +14,7 @@ services:
   gui:
     build:
       context: .
-      dockerfile: db
+      dockerfile:Dockerfile-gui
     container_name: scanner_gui_v2
     environment:
       - DISPLAY=${DISPLAY}
