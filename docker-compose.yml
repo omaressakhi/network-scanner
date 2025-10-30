@@ -4,7 +4,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: dDf
+      dockerfile:Dockerfile-backend
     container_name: scanner_backend
     networks:
       - scanner_net
