@@ -3,7 +3,7 @@ version: "3.9"
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile-backend
     container_name: scanner_backend
     networks:
@@ -13,7 +13,7 @@ services:
 
   gui:
     build:
-      context: .
+      context: ./gui
       dockerfile: Dockerfile-gui
     container_name: scanner_gui_v2
     environment:
