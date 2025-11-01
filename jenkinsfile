@@ -13,27 +13,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build and Start Containers') {
             steps {
-                echo 'Building Docker images...'
-                sh 'docker-compose build'
+                echo 'Building and starting all services via docker-compose...'
+                sh 'docker-compose -f docker-compose.yml up --build -d'
             }
         }
 
-        stage('Start Backend') {
+        stage('Run GUI Scanner') {
             steps {
-                echo 'Starting backend container...'
-                sh 'docker-compose up -d backend'
-            }
-        }
-
-        stage('Run GUI Headless') {
-            steps {
-                echo 'Running GUI container headless...'
+                echo 'Launching GUI container...'
                 sh '''
-                Xvfb :99 -screen 0 1024x768x16 &
-                export DISPLAY=:99
-                docker-compose run --rm gui
+                xhost +local:docker
+                docker-compose -f docker-compose.yml run --rm gui
                 '''
             }
         }
@@ -42,7 +34,7 @@ pipeline {
     post {
         always {
             echo 'Stopping all containers...'
-            sh 'docker-compose down'
+            sh 'docker-compose -f docker-compose.yml down'
         }
     }
 }
