@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         COMPOSE_PROJECT_NAME = "network_scanner"
-        DISPLAY = ":99"  // headless display for GUI
     }
 
     stages {
@@ -14,27 +13,27 @@ pipeline {
             }
         }
 
-        stage('Build Containers') {
+        stage('Build Docker Images') {
             steps {
                 echo 'Building Docker images...'
-                sh 'docker-compose -f docker-compose.yml build'
+                sh 'docker-compose build'
             }
         }
 
         stage('Start Backend') {
             steps {
                 echo 'Starting backend container...'
-                sh 'docker-compose -f docker-compose.yml up -d backend'
+                sh 'docker-compose up -d backend'
             }
         }
 
         stage('Run GUI Headless') {
             steps {
-                echo 'Running GUI container in headless mode...'
+                echo 'Running GUI container headless...'
                 sh '''
-                apt-get update && apt-get install -y xvfb
                 Xvfb :99 -screen 0 1024x768x16 &
-                docker-compose -f docker-compose.yml run --rm gui
+                export DISPLAY=:99
+                docker-compose run --rm gui
                 '''
             }
         }
@@ -43,7 +42,7 @@ pipeline {
     post {
         always {
             echo 'Stopping all containers...'
-            sh 'docker-compose -f docker-compose.yml down'
+            sh 'docker-compose down'
         }
     }
 }
