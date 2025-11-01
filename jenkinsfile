@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        COMPOSE_PROJECT_NAME = "network_scanner"
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
@@ -13,28 +9,18 @@ pipeline {
             }
         }
 
-        stage('Build and Start Containers') {
+        stage('Build Docker Images') {
             steps {
-                echo 'Building and starting all services via docker-compose...'
-                sh 'docker-compose -f docker-compose.yml up --build -d'
-            }
-        }
-
-        stage('Run GUI Scanner') {
-            steps {
-                echo 'Launching GUI container...'
-                sh '''
-                xhost +local:docker
-                docker-compose -f docker-compose.yml run --rm gui
-                '''
+                echo 'Building Docker images only...'
+                sh 'docker-compose build'
             }
         }
     }
 
     post {
         always {
-            echo 'Stopping all containers...'
-            sh 'docker-compose -f docker-compose.yml down'
+            echo 'Done building Docker images.'
         }
     }
 }
+
