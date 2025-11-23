@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment       
+  labels:
+    app: network-scanner
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-scanner
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: network-scanner
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: network_scanner-backend:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python3"]
+          args: ["scanner.py"]      
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment       
+  labels:
+    app: network-scanner
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-scanner
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: network-scanner
+        tier: frontend
+    spec:
+      containers:
+        - name: desktop-gui
+          image: network_scanner-gui:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python3"]
+          args: ["pyqt_scanner.py"]      
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
