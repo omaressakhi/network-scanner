@@ -15,7 +15,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/omar-essakhi/network-scanner.git', credentialsId: 'rbs'
+                git url: 'https://github.com/omaressakhi/network-scanner.git', credentialsId: 'rbs'
             }
         }
 
