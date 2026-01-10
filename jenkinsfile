@@ -6,7 +6,7 @@ pipeline {
                 checkout([$class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/omar-essakhi/network-scanner.git',
+                        url: 'https://github.com/omaressakhi/network-scanner.git',
                         credentialsId: 'rbs' // <-- ton credential GitHub ici
                     ]]
                 ])
