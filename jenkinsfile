@@ -4,6 +4,7 @@ pipeline {
     environment {
         GUI_IMAGE = 'network-scanner-frontend'
         BACKEND_IMAGE = 'network-scanner-backend'
+        DOCKERHUB_USER = 'omar338' // ← ton nom d'utilisateur Docker Hub
     }
 
     stages {
@@ -30,6 +31,23 @@ pipeline {
             steps {
                 echo "Building Backend Docker image..."
                 sh 'docker build -t $BACKEND_IMAGE -f backend/Dockerfile-backend backend'
+            }
+        }
+
+        stage('Tag Docker Images') {
+            steps {
+                sh 'docker tag $GUI_IMAGE $DOCKERHUB_USER/$GUI_IMAGE:latest'
+                sh 'docker tag $BACKEND_IMAGE $DOCKERHUB_USER/$BACKEND_IMAGE:latest'
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
+                    sh 'echo $DOCKER_TOKEN | docker login -u $DOCKERHUB_USER --password-stdin'
+                    sh 'docker push $DOCKERHUB_USER/$GUI_IMAGE:latest'
+                    sh 'docker push $DOCKERHUB_USER/$BACKEND_IMAGE:latest'
+                }
             }
         }
     }
