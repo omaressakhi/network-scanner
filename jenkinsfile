@@ -1,27 +1,29 @@
 pipeline {
     agent any
-
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/omar-essakhi/network-scanner.git',
+                        credentialsId: 'rbs' // <-- ton credential GitHub ici
+                    ]]
+                ])
+            }
+        }
+
         stage('Checkout') {
             steps {
-                git branch: 'main', 
-                    url: 'https://github.com/omar-essakhi/network-scanner.git'
+                git url: 'https://github.com/omar-essakhi/network-scanner.git', credentialsId: 'rbs'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh """
-                docker build -t network-scanner:latest \
-                -f gui/Dockerfile-gui gui
-                """
+                echo "Building Docker image..."
+                // tes commandes Docker ici
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Build finished!"
         }
     }
 }
