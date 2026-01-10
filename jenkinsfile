@@ -8,6 +8,12 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup Workspace') {
+            steps {
+                sh "docker system prune -f"
+            }
+        }
+
         stage('Checkout SCM') {
             steps {
                 checkout([$class: 'GitSCM',
@@ -43,8 +49,8 @@ pipeline {
 
         stage('Push Docker Images') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
-                    sh "echo ${DOCKER_TOKEN} | docker login -u ${DOCKERHUB_USER} --password-stdin"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-token', usernameVariable: 'DUSER', passwordVariable: 'DPASS')]) {
+                    sh 'echo ${DPASS} | docker login -u ${DUSER} --password-stdin'
                     sh "docker push ${DOCKERHUB_USER}/${GUI_IMAGE}:latest"
                     sh "docker push ${DOCKERHUB_USER}/${BACKEND_IMAGE}:latest"
                 }
