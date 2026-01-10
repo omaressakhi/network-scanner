@@ -1,26 +1,32 @@
 pipeline {
     agent any
 
+    environment {
+        APP_NAME = "network-scanner-frontend"
+        APP_PATH = "/home/omar-essakhi/Documents/network-scanner/gui"
+        DOCKER_IMAGE = "network-scanner-frontend:latest"
+    }
+
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                echo 'Checking out code from GitHub...'
-                git branch: 'main', url: 'https://github.com/omaressakhi/network-scanner.git'
+                // نسحب repo إذا عندك
+                git 'https://github.com/omar-essakhi/network-scanner.git'
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Building Docker images only...'
-                sh 'docker-compose build'
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE} -f ${APP_PATH}/Dockerfile-gui ${APP_PATH}"
+                }
             }
         }
     }
 
     post {
         always {
-            echo 'Done building Docker images.'
+            echo "Build finished!"
         }
     }
 }
-
