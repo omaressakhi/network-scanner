@@ -22,14 +22,14 @@ pipeline {
         stage('Build GUI Docker Image') {
             steps {
                 echo "Building GUI Docker image..."
-                sh 'docker build -t $GUI_IMAGE -f gui/Dockerfile-gui gui'
+                sh 'docker build -t $GUI_IMAGE -f gui/Dockerfile-gui .'
             }
         }
 
         stage('Build Backend Docker Image') {
             steps {
                 echo "Building Backend Docker image..."
-                sh 'docker build -t $BACKEND_IMAGE -f backend/Dockerfile-backend backend'
+                sh 'docker build -t $BACKEND_IMAGE -f backend/Dockerfile-backend .'
             }
         }
     }
