@@ -1,24 +1,42 @@
 pipeline {
     agent any
 
+    environment {
+        GUI_IMAGE = 'network-scanner-frontend'
+        BACKEND_IMAGE = 'network-scanner-backend'
+    }
+
     stages {
         stage('Checkout SCM') {
             steps {
                 checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],   // branch s7i7
+                    branches: [[name: '*/main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/omaressakhi/network-scanner.git', // s7i7 URL
-                        credentialsId: 'rbs' // credential li 3andk
+                        url: 'https://github.com/omaressakhi/network-scanner.git',
+                        credentialsId: 'rbs'
                     ]]
                 ])
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build GUI Docker Image') {
             steps {
-                echo "Building Docker image..."
-                sh 'docker build -t network-scanner-frontend -f gui/Dockerfile-gui .'
+                echo "Building GUI Docker image..."
+                sh 'docker build -t $GUI_IMAGE -f gui/Dockerfile-gui gui'
             }
+        }
+
+        stage('Build Backend Docker Image') {
+            steps {
+                echo "Building Backend Docker image..."
+                sh 'docker build -t $BACKEND_IMAGE -f backend/Dockerfile-backend backend'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished"
         }
     }
 }
