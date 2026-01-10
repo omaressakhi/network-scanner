@@ -4,14 +4,17 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-               
-                git branch: 'main', url: 'https://github.com/omar-essakhi/network-scanner.git'
+                git branch: 'main', 
+                    url: 'https://github.com/omar-essakhi/network-scanner.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t network-scanner:latest /home/omar-essakhi/Documents/network-scanner/gui"
+                sh """
+                docker build -t network-scanner:latest \
+                -f gui/Dockerfile-gui gui
+                """
             }
         }
     }
