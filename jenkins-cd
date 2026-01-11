@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         KUBECONFIG = '/var/lib/jenkins/.kube/config'  // Jenkins user config
-        REPO_URL = 'https://github.com/omar338/network-scanner.git'
+        REPO_URL = 'https://github.com/omaressakhi/network-scanner.git'
         REPO_BRANCH = 'main'  // ou master selon ton repo
     }
 
