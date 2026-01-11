@@ -14,17 +14,11 @@ pipeline {
             }
         }
 
-        stage('Deploy to Minikube') {
-            steps {
-                sh """
-                # Appliquer tous les YAML du repo
-                kubectl --kubeconfig=${KUBECONFIG} apply -f .
-                
-                # Afficher les pods pour vérifier le déploiement
-                kubectl --kubeconfig=${KUBECONFIG} get pods -A
-                """
-            }
-        }
+     stage('Deploy to Minikube') {
+    steps {
+        sh 'kubectl --kubeconfig=/var/lib/jenkins/.kube/config apply -f k8s.yaml'
+    }
+}
     }
 
     post {
