@@ -2,6 +2,9 @@ pipeline {
     agent any
 
     environment {
+        // Fix Docker push 400 errors
+        DOCKER_BUILDKIT = '0'
+
         GUI_IMAGE = 'network-scanner-frontend'
         BACKEND_IMAGE = 'network-scanner-backend'
         DOCKERHUB_USER = 'omar338'
@@ -49,7 +52,7 @@ pipeline {
             }
         }
 
-        stage('Push Docker Images') {
+        stage('Push GUI Image') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -61,6 +64,21 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                         docker push ${DOCKERHUB_USER}/${GUI_IMAGE}:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Push Backend Image') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
                         docker push ${DOCKERHUB_USER}/${BACKEND_IMAGE}:latest
                     '''
                 }
