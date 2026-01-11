@@ -8,15 +8,17 @@ pipeline {
     }
 
     stages {
-        stage('Cleanup Workspace') {
+
+        stage('Cleanup Docker') {
             steps {
-                sh "docker system prune -f"
+                sh 'docker system prune -f'
             }
         }
 
         stage('Checkout SCM') {
             steps {
-                checkout([$class: 'GitSCM',
+                checkout([
+                    $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/omaressakhi/network-scanner.git',
@@ -28,31 +30,39 @@ pipeline {
 
         stage('Build GUI Docker Image') {
             steps {
-                echo "Building GUI Docker image..."
-                sh "docker build -t ${GUI_IMAGE} -f gui/Dockerfile-gui gui"
+                echo 'Building GUI image...'
+                sh 'docker build -t ${GUI_IMAGE} -f gui/Dockerfile-gui gui'
             }
         }
 
         stage('Build Backend Docker Image') {
             steps {
-                echo "Building Backend Docker image..."
-                sh "docker build -t ${BACKEND_IMAGE} -f backend/Dockerfile-backend backend"
+                echo 'Building Backend image...'
+                sh 'docker build -t ${BACKEND_IMAGE} -f backend/Dockerfile-backend backend'
             }
         }
 
         stage('Tag Docker Images') {
             steps {
-                sh "docker tag ${GUI_IMAGE} ${DOCKERHUB_USER}/${GUI_IMAGE}:latest"
-                sh "docker tag ${BACKEND_IMAGE} ${DOCKERHUB_USER}/${BACKEND_IMAGE}:latest"
+                sh 'docker tag ${GUI_IMAGE} ${DOCKERHUB_USER}/${GUI_IMAGE}:latest'
+                sh 'docker tag ${BACKEND_IMAGE} ${DOCKERHUB_USER}/${BACKEND_IMAGE}:latest'
             }
         }
 
         stage('Push Docker Images') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-token', usernameVariable: 'DUSER', passwordVariable: 'DPASS')]) {
-                    sh 'echo ${DPASS} | docker login -u ${DUSER} --password-stdin'
-                    sh "docker push ${DOCKERHUB_USER}/${GUI_IMAGE}:latest"
-                    sh "docker push ${DOCKERHUB_USER}/${BACKEND_IMAGE}:latest"
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKERHUB_USER}/${GUI_IMAGE}:latest
+                        docker push ${DOCKERHUB_USER}/${BACKEND_IMAGE}:latest
+                    '''
                 }
             }
         }
@@ -60,8 +70,8 @@ pipeline {
 
     post {
         always {
-            sh "docker logout"
-            echo "Pipeline finished"
+            sh 'docker logout || true'
+            echo 'Pipeline finished'
         }
     }
 }
