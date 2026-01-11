@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: network_scanner-backend:latest
+          image: omar338/network-scanner-backend
           imagePullPolicy: IfNotPresent
           command: ["python3"]
           args: ["scanner.py"]      
@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
         - name: desktop-gui
-          image: network_scanner-gui:latest
+          image: omar338/network-scanner-frontend
           imagePullPolicy: IfNotPresent
           command: ["python3"]
           args: ["pyqt_scanner.py"]      
