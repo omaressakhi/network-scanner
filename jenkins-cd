@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    environment {
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'  // Jenkins user config
+        REPO_URL = 'https://github.com/omar338/network-scanner.git'
+        REPO_BRANCH = 'main'  // ou master selon ton repo
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: "${REPO_BRANCH}", url: "${REPO_URL}"
+            }
+        }
+
+        stage('Deploy to Minikube') {
+            steps {
+                sh """
+                # Appliquer tous les YAML du repo
+                kubectl --kubeconfig=${KUBECONFIG} apply -f .
+                
+                # Afficher les pods pour vérifier le déploiement
+                kubectl --kubeconfig=${KUBECONFIG} get pods -A
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Déploiement terminé avec succès!"
+        }
+        failure {
+            echo "Erreur pendant le déploiement. Vérifie les logs!"
+        }
+    }
+}
